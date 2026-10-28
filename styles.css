@@ -97,8 +97,46 @@ footer:last-child {
     margin-bottom: 40px;
 }
 
-@media (max-width: 768px) {
+/* Privacy-Seite */
+.privacy-page {
+    max-width: 900px;
+    margin: 60px auto;
+    padding: 0 20px 60px;
+}
 
+.back-link {
+    display: inline-block;
+    margin-bottom: 24px;
+}
+
+/* Überblendung beim Wechsel der Seiten */
+header,
+main,
+.privacy-page {
+    transition: opacity 180ms ease;
+}
+
+body.is-fading header,
+body.is-fading main,
+body.is-fading .privacy-page {
+    opacity: 0;
+}
+
+/* Sorgt dafür, dass hidden-Elemente wirklich ausgeblendet bleiben */
+[hidden] {
+    display: none !important;
+}
+
+/* Animation für Nutzer deaktivieren, die reduzierte Bewegung bevorzugen */
+@media (prefers-reduced-motion: reduce) {
+    header,
+    main,
+    .privacy-page {
+        transition: none;
+    }
+}
+
+@media (max-width: 768px) {
     header {
         margin: 40px auto;
     }

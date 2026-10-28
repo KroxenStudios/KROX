@@ -1,78 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KroxenStudios - KROX Engine</title>
-<link rel="icon" href="images/KROX-white.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body {
-    margin: 0;
-    background: #000;
-    color: #fff;
-    font-family: system-ui, sans-serif;
-}
+    <title>KroxenStudios - KROX Engine</title>
+    <link rel="icon" href="images/KROX-white.ico" type="image/x-icon">
 
-header {
-    max-width: 900px;
-    margin: 60px auto;
-    padding: 0 20px;
-}
+    <style>
+        :root {
+            --bg: #000;
+            --text: #fff;
+            --muted: #aaa;
+            --muted-dark: #888;
+            --border: #333;
+            --border-hover: #555;
+            --button: #111;
+            --button-hover: #1a1a1a;
+        }
 
-h1 {
-    margin: 0;
-    font-size: 2rem;
-    font-weight: 600;
-}
+        * {
+            box-sizing: border-box;
+        }
 
-p {
-    color: #aaa;
-    line-height: 1.6;
-}
+        html {
+            scroll-behavior: smooth;
+        }
 
-main {
-    max-width: 900px;
-    margin: auto;
-    padding: 0 20px 60px;
-}
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            line-height: 1.6;
+        }
 
-figure {
-    margin: 0 0 60px;
-}
+        header,
+        main,
+        .privacy-page {
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
 
-img {
-    width: 100%;
-    display: block;
-    border-radius: 4px;
-}
+        header {
+            margin-top: 60px;
+            margin-bottom: 60px;
+        }
 
-figcaption {
-    margin-top: 12px;
-    color: #888;
-    font-size: 0.95rem;
-}
+        main {
+            padding-bottom: 60px;
+        }
 
-a {
-    color: #fff;
-    text-decoration: none;
-}
+        h1 {
+            margin: 0;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 600;
+        }
 
-a:hover {
-    text-decoration: underline;
-}
+        p {
+            color: var(--muted);
+            line-height: 1.7;
+        }
 
-.github-link {
-    display: inline-block;
-    margin-top: 12px;
-}
+        figure {
+            margin: 0 0 60px;
+        }
 
-footer {
-    color: #666;
-    margin-top: 24px;
-    font-size: 0.9rem;
-}
-</style>
+        img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 6px;
+            background: #111;
+        }
+
+        figcaption {
+            margin-top: 12px;
+            color: var(--muted-dark);
+            font-size: 0.95rem;
+        }
+
+        a {
+            color: var(--text);
+        }
+
+        .github-btn {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 10px 16px;
+            background: var(--button);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            text-decoration: none;
+            transition: 0.15s ease;
+        }
+
+        .github-btn:hover {
+            background: var(--button-hover);
+            border-color: var(--border-hover);
+        }
+
+        footer {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 16px;
+        }
+
+        footer p {
+            color: #666;
+        }
+
+        .privacy-page {
+            padding-top: 60px;
+            padding-bottom: 60px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 24px;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--button);
+            color: var(--text);
+            font: inherit;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: var(--button-hover);
+            border-color: var(--border-hover);
+        }
+
+        /* Hinweisbanner am unteren Bildschirmrand */
+        .notice {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 20px;
+            background: #181818;
+            border-top: 1px solid var(--border);
+            box-shadow: 0 -4px 18px rgb(0 0 0 / 35%);
+        }
+
+        .notice p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .notice a {
+            white-space: nowrap;
+        }
+
+        .notice button {
+            flex-shrink: 0;
+        }
+
+        /* Überblendung beim Wechsel zwischen Galerie und Privacy-Seite */
+        header,
+        main,
+        .privacy-page {
+            transition: opacity 180ms ease;
+        }
+
+        body.is-fading header,
+        body.is-fading main,
+        body.is-fading .privacy-page {
+            opacity: 0;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            header,
+            main,
+            .privacy-page {
+                transition: none;
+            }
+
+            html {
+                scroll-behavior: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                margin-top: 40px;
+                margin-bottom: 40px;
+            }
+
+            figure {
+                margin-bottom: 40px;
+            }
+
+            figcaption {
+                font-size: 0.9rem;
+            }
+
+            .notice {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
+
 <body>
+
+<div class="notice" id="analytics-notice">
+    <p>
+        This site uses GoatCounter for visitor statistics.
+        <a href="#privacy">Privacy information</a>
+    </p>
+    <button id="notice-ok" type="button">Okay</button>
+</div>
 
 <header>
     <h1>KroxenStudios</h1>
@@ -83,7 +240,7 @@ footer {
         atmosphere and long-distance exploration.
     </p>
 
-    <a class="github-link"
+    <a class="github-btn"
        href="https://github.com/KroxenStudios/KROX"
        target="_blank"
        rel="noopener noreferrer">
@@ -92,7 +249,6 @@ footer {
 </header>
 
 <main>
-
     <figure>
         <img src="images/01.png" alt="Golden Hour">
         <figcaption></figcaption>
@@ -109,24 +265,146 @@ footer {
     </figure>
 
     <figure>
-    <img src="images/04.png" alt="Water">
-    <figcaption></figcaption>
-</figure>
+        <img src="images/04.png" alt="Water">
+        <figcaption></figcaption>
+    </figure>
 
-<footer>
-    Pictures: 25.10-28.10.2026
-</footer>
-
-<footer>
-    Copyright © 2026 KroxenStudios, a development branch of KROX.
-</footer>
-
+    <footer>
+        <p>Pictures: 25.10–28.10.2026</p>
+        <p>Copyright © 2026 KroxenStudios, a development branch of KROX.</p>
+        <p><a href="#privacy">Privacy</a></p>
+    </footer>
 </main>
 
-<script
-    data-goatcounter="https://kroxenstudios.goatcounter.com/count"
-    async
-    src="https://gc.zgo.at/count.js">
+<section id="privacy" class="privacy-page" hidden>
+    <a href="#" class="back-link">← Back to home</a>
+
+    <h1>Privacy</h1>
+
+    <p>
+        This website uses GoatCounter to count page views and understand
+        how the site is used. GoatCounter is designed to provide
+        privacy-friendly, cookie-free website analytics.
+    </p>
+
+    <p>
+        You can opt out of GoatCounter analytics for this browser below.
+        Your choice is saved in this browser.
+    </p>
+
+    <button id="analytics-opt-out" type="button">
+        Opt out of analytics
+    </button>
+
+    <p id="opt-out-status" aria-live="polite"></p>
+
+    <p>
+        For more information, see
+        <a href="https://goatcounter.com/help/privacy"
+           target="_blank"
+           rel="noopener noreferrer">
+            GoatCounter’s privacy information
+        </a>.
+    </p>
+</section>
+
+<script>
+    const goatCounterCode = "kroxenstudios";
+    const optOutKey = "kroxenstudios-analytics-opt-out";
+    const noticeKey = "kroxenstudios-analytics-notice-dismissed";
+
+    const header = document.querySelector("header");
+    const main = document.querySelector("main");
+    const privacyPage = document.querySelector(".privacy-page");
+    const notice = document.querySelector("#analytics-notice");
+    const noticeButton = document.querySelector("#notice-ok");
+    const optOutButton = document.querySelector("#analytics-opt-out");
+    const optOutStatus = document.querySelector("#opt-out-status");
+
+    function hasOptedOut() {
+        return localStorage.getItem(optOutKey) === "yes";
+    }
+
+    function browserRequestsNoTracking() {
+        return navigator.doNotTrack === "1" ||
+            navigator.doNotTrack === "yes" ||
+            window.doNotTrack === "1";
+    }
+
+    function loadGoatCounter() {
+        if (hasOptedOut() || browserRequestsNoTracking()) {
+            return;
+        }
+
+        const script = document.createElement("script");
+        script.async = true;
+        script.src = "https://gc.zgo.at/count.js";
+        script.dataset.goatcounter =
+            `https://${goatCounterCode}.goatcounter.com/count`;
+
+        document.body.appendChild(script);
+    }
+
+    function updateOptOutStatus() {
+        if (hasOptedOut()) {
+            optOutButton.textContent = "Opt out is enabled — click to opt in";
+            optOutStatus.textContent =
+                "Analytics is disabled in this browser.";
+        } else {
+            optOutButton.textContent = "Opt out of analytics";
+            optOutStatus.textContent = "";
+        }
+    }
+
+    let isChangingPage = false;
+
+    function showPage() {
+        if (isChangingPage) {
+            return;
+        }
+
+        isChangingPage = true;
+        document.body.classList.add("is-fading");
+
+        setTimeout(() => {
+            const isPrivacyPage = window.location.hash === "#privacy";
+
+            header.hidden = isPrivacyPage;
+            main.hidden = isPrivacyPage;
+            privacyPage.hidden = !isPrivacyPage;
+
+            requestAnimationFrame(() => {
+                document.body.classList.remove("is-fading");
+                isChangingPage = false;
+            });
+        }, 180);
+    }
+
+    noticeButton.addEventListener("click", () => {
+        localStorage.setItem(noticeKey, "yes");
+        notice.hidden = true;
+    });
+
+    optOutButton.addEventListener("click", () => {
+        if (hasOptedOut()) {
+            localStorage.removeItem(optOutKey);
+        } else {
+            localStorage.setItem(optOutKey, "yes");
+        }
+
+        updateOptOutStatus();
+    });
+
+    if (localStorage.getItem(noticeKey) === "yes") {
+        notice.hidden = true;
+    }
+
+    window.addEventListener("hashchange", showPage);
+
+    updateOptOutStatus();
+    showPage();
+    loadGoatCounter();
 </script>
+
 </body>
 </html>
