@@ -132,6 +132,21 @@
             color: var(--muted-dark);
             font-size: 0.9rem;
             text-decoration: none;
+            opacity: 0;
+            visibility: hidden;
+            transition:
+                opacity 700ms ease,
+                color 1800ms ease,
+                visibility 0s linear 700ms;
+        }
+
+        body.intro-complete .github-link {
+            opacity: 1;
+            visibility: visible;
+            transition:
+                opacity 700ms ease,
+                color 1800ms ease,
+                visibility 0s;
         }
 
         .github-link:hover {
@@ -269,7 +284,8 @@
             .content-page,
             .notice,
             figure.slide-in,
-            figure.slide-in:nth-of-type(even) {
+            figure.slide-in:nth-of-type(even),
+            .github-link {
                 transition: none;
             }
 
@@ -547,12 +563,16 @@
     showPage();
     loadGoatCounter();
 
-    // Erst die Seite einblenden, dann die Bildanimationen starten.
+    // Erst die Seite einblenden, dann nach der Anfangssequenz
+    // den GitHub-Link anzeigen und die Bildanimationen starten.
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
             document.body.classList.remove("is-loading");
 
-            setTimeout(startImageAnimations, 1800);
+            setTimeout(() => {
+                document.body.classList.add("intro-complete");
+                startImageAnimations();
+            }, 1800);
         });
     });
 </script>
