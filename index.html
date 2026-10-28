@@ -90,8 +90,16 @@
             margin: 0 0 60px;
         }
 
-        /* Bilder gleiten beim Scrollen abwechselnd von links und rechts herein */
+        /*
+         * Ohne JavaScript sind die Bilder sofort sichtbar.
+         * Animationen werden nur mit der Klasse .js-enabled eingeschaltet.
+         */
         figure.slide-in {
+            opacity: 1;
+            transform: none;
+        }
+
+        body.js-enabled figure.slide-in {
             opacity: 0;
             transform: translateX(-60px);
             transition:
@@ -99,11 +107,11 @@
                 transform 1800ms cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        figure.slide-in:nth-of-type(even) {
+        body.js-enabled figure.slide-in:nth-of-type(even) {
             transform: translateX(60px);
         }
 
-        figure.slide-in.is-visible {
+        body.js-enabled figure.slide-in.is-visible {
             opacity: 1;
             transform: translateX(0);
         }
@@ -132,6 +140,9 @@
             color: var(--muted-dark);
             font-size: 0.9rem;
             text-decoration: none;
+        }
+
+        body.js-enabled .github-link {
             opacity: 0;
             visibility: hidden;
             transition:
@@ -140,7 +151,7 @@
                 visibility 0s linear 700ms;
         }
 
-        body.intro-complete .github-link {
+        body.js-enabled.intro-complete .github-link {
             opacity: 1;
             visibility: visible;
             transition:
@@ -174,9 +185,23 @@
             text-decoration: underline;
         }
 
+        /*
+         * Die Unterseiten funktionieren über CSS :target,
+         * also auch ohne JavaScript.
+         */
         .content-page {
+            display: none;
             padding-top: 60px;
             padding-bottom: 60px;
+        }
+
+        .content-page:target {
+            display: block;
+        }
+
+        body:has(.content-page:target) header,
+        body:has(.content-page:target) main {
+            display: none;
         }
 
         .back-link {
@@ -206,14 +231,17 @@
             border-color: var(--border-hover);
         }
 
-        /* Hinweisbanner am unteren Bildschirmrand */
+        /*
+         * Der Hinweis wird nur angezeigt, wenn JavaScript läuft
+         * und Analytics gegebenenfalls geladen werden kann.
+         */
         .notice {
+            display: none;
             position: fixed;
             right: 0;
             bottom: 0;
             left: 0;
             z-index: 1000;
-            display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 16px;
@@ -221,6 +249,10 @@
             background: #181818;
             border-top: 1px solid var(--border);
             box-shadow: 0 -4px 18px rgb(0 0 0 / 35%);
+        }
+
+        body.js-enabled .notice {
+            display: flex;
         }
 
         .notice p {
@@ -252,48 +284,22 @@
             flex-shrink: 0;
         }
 
-        /* Einblenden beim ersten Laden */
-        header,
-        main,
-        .content-page,
-        .notice {
-            transition: opacity 1800ms ease;
-        }
-
-        body.is-loading header,
-        body.is-loading main,
-        body.is-loading .content-page,
-        body.is-loading .notice {
-            opacity: 0;
-        }
-
-        /* Überblendung beim Seitenwechsel */
-        body.is-fading header,
-        body.is-fading main,
-        body.is-fading .content-page {
-            opacity: 0;
-        }
-
         [hidden] {
             display: none !important;
         }
 
         @media (prefers-reduced-motion: reduce) {
-            header,
-            main,
-            .content-page,
-            .notice,
-            figure.slide-in,
-            figure.slide-in:nth-of-type(even),
-            .github-link {
-                transition: none;
-            }
-
             html {
                 scroll-behavior: auto;
             }
 
-            figure.slide-in {
+            body.js-enabled figure.slide-in,
+            body.js-enabled figure.slide-in:nth-of-type(even),
+            body.js-enabled .github-link {
+                transition: none;
+            }
+
+            body.js-enabled figure.slide-in {
                 opacity: 1;
                 transform: none;
             }
@@ -321,7 +327,7 @@
     </style>
 </head>
 
-<body class="is-loading">
+<body>
 
 <div class="notice" id="analytics-notice">
     <p>
@@ -380,7 +386,7 @@
     </footer>
 </main>
 
-<section id="privacy" class="content-page" hidden>
+<section id="privacy" class="content-page">
     <a href="#" class="back-link">← Back to home</a>
 
     <h1>Privacy settings</h1>
@@ -436,7 +442,7 @@
     </p>
 </section>
 
-<section id="contact" class="content-page" hidden>
+<section id="contact" class="content-page">
     <a href="#" class="back-link">← Back to home</a>
 
     <h1>Contact</h1>
@@ -448,21 +454,27 @@
 </section>
 
 <script>
+    /*
+     * Die Seite funktioniert auch ohne dieses Script.
+     * Diese Klasse aktiviert lediglich die optionalen Effekte.
+     */
+    document.body.classList.add("js-enabled");
+
     const goatCounterCode = "kroxenstudios";
     const optOutKey = "kroxenstudios-analytics-opt-out";
     const noticeKey = "kroxenstudios-analytics-notice-dismissed";
 
-    const header = document.querySelector("header");
-    const main = document.querySelector("main");
-    const privacyPage = document.querySelector("#privacy");
-    const contactPage = document.querySelector("#contact");
     const notice = document.querySelector("#analytics-notice");
     const noticeButton = document.querySelector("#notice-ok");
     const optOutButton = document.querySelector("#analytics-opt-out");
     const optOutStatus = document.querySelector("#opt-out-status");
 
     function hasOptedOut() {
-        return localStorage.getItem(optOutKey) === "yes";
+        try {
+            return localStorage.getItem(optOutKey) === "yes";
+        } catch {
+            return false;
+        }
     }
 
     function browserRequestsNoTracking() {
@@ -486,6 +498,10 @@
     }
 
     function updateOptOutStatus() {
+        if (!optOutButton || !optOutStatus) {
+            return;
+        }
+
         if (hasOptedOut()) {
             optOutButton.textContent = "Opt out is enabled — click to opt in";
             optOutStatus.textContent =
@@ -496,53 +512,50 @@
         }
     }
 
-    let isChangingPage = false;
+    if (noticeButton) {
+        noticeButton.addEventListener("click", () => {
+            try {
+                localStorage.setItem(noticeKey, "yes");
+            } catch {
+                // Die Schaltfläche blendet den Hinweis auch ohne Storage aus.
+            }
 
-    function showPage() {
-        if (isChangingPage) {
+            notice.hidden = true;
+        });
+    }
+
+    try {
+        if (localStorage.getItem(noticeKey) === "yes") {
+            notice.hidden = true;
+        }
+    } catch {
+        // Bei nicht verfügbarem Storage bleibt der Hinweis sichtbar.
+    }
+
+    if (optOutButton) {
+        optOutButton.addEventListener("click", () => {
+            try {
+                if (hasOptedOut()) {
+                    localStorage.removeItem(optOutKey);
+                } else {
+                    localStorage.setItem(optOutKey, "yes");
+                }
+            } catch {
+                // Die Opt-out-Einstellung kann ohne Storage nicht gespeichert werden.
+            }
+
+            updateOptOutStatus();
+        });
+    }
+
+    function startImageAnimations() {
+        if (!("IntersectionObserver" in window)) {
+            document.querySelectorAll("figure.slide-in").forEach(figure => {
+                figure.classList.add("is-visible");
+            });
             return;
         }
 
-        isChangingPage = true;
-        document.body.classList.add("is-fading");
-
-        setTimeout(() => {
-            const page = window.location.hash;
-
-            header.hidden = page === "#privacy" || page === "#contact";
-            main.hidden = page === "#privacy" || page === "#contact";
-            privacyPage.hidden = page !== "#privacy";
-            contactPage.hidden = page !== "#contact";
-
-            requestAnimationFrame(() => {
-                document.body.classList.remove("is-fading");
-                isChangingPage = false;
-            });
-        }, 500);
-    }
-
-    noticeButton.addEventListener("click", () => {
-        localStorage.setItem(noticeKey, "yes");
-        notice.hidden = true;
-    });
-
-    optOutButton.addEventListener("click", () => {
-        if (hasOptedOut()) {
-            localStorage.removeItem(optOutKey);
-        } else {
-            localStorage.setItem(optOutKey, "yes");
-        }
-
-        updateOptOutStatus();
-    });
-
-    if (localStorage.getItem(noticeKey) === "yes") {
-        notice.hidden = true;
-    }
-
-    window.addEventListener("hashchange", showPage);
-
-    function startImageAnimations() {
         const slideObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -560,15 +573,10 @@
     }
 
     updateOptOutStatus();
-    showPage();
     loadGoatCounter();
 
-    // Erst die Seite einblenden, dann nach der Anfangssequenz
-    // den GitHub-Link anzeigen und die Bildanimationen starten.
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-            document.body.classList.remove("is-loading");
-
             setTimeout(() => {
                 document.body.classList.add("intro-complete");
                 startImageAnimations();
