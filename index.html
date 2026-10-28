@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>KroxenStudios - KROX Engine</title>
+    <title>KROX - Game Engine</title>
     <link rel="icon" href="images/KROX-white.ico" type="image/x-icon">
 
     <style>
@@ -37,7 +37,7 @@
 
         header,
         main,
-        .privacy-page {
+        .content-page {
             max-width: 900px;
             margin-left: auto;
             margin-right: auto;
@@ -60,7 +60,28 @@
             font-weight: 600;
         }
 
+        .logo {
+            display: block;
+            width: auto;
+            max-width: 100%;
+            height: 130px;
+            margin-bottom: 4px;
+            background: transparent;
+            border-radius: 0;
+        }
+
+        .subtitle {
+            margin-top: 0;
+            color: var(--muted-dark);
+            font-size: 1.1rem;
+        }
+
         p {
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        li {
             color: var(--muted);
             line-height: 1.7;
         }
@@ -87,34 +108,40 @@
             color: var(--text);
         }
 
-        .github-btn {
+        .github-link {
             display: inline-block;
-            margin-top: 16px;
-            padding: 10px 16px;
-            background: var(--button);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text);
+            margin-top: 12px;
+            color: var(--muted-dark);
+            font-size: 0.9rem;
             text-decoration: none;
-            transition: 0.15s ease;
         }
 
-        .github-btn:hover {
-            background: var(--button-hover);
-            border-color: var(--border-hover);
+        .github-link:hover {
+            color: var(--text);
+            text-decoration: underline;
         }
 
         footer {
+            margin-top: 16px;
             color: #666;
             font-size: 0.9rem;
-            margin-top: 16px;
         }
 
         footer p {
             color: #666;
         }
 
-        .privacy-page {
+        footer a {
+            color: #888;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--text);
+            text-decoration: underline;
+        }
+
+        .content-page {
             padding-top: 60px;
             padding-bottom: 60px;
         }
@@ -122,6 +149,13 @@
         .back-link {
             display: inline-block;
             margin-bottom: 24px;
+            color: var(--muted-dark);
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            color: var(--text);
+            text-decoration: underline;
         }
 
         button {
@@ -162,24 +196,48 @@
             font-size: 0.9rem;
         }
 
-        .notice a {
+        .privacy-settings-link {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 4px 10px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            color: var(--text);
+            font-size: 0.85rem;
+            text-decoration: none;
             white-space: nowrap;
+            transition: background 0.15s ease, border-color 0.15s ease;
+        }
+
+        .privacy-settings-link:hover {
+            background: var(--button-hover);
+            border-color: var(--border-hover);
+            text-decoration: none;
         }
 
         .notice button {
             flex-shrink: 0;
         }
 
-        /* Überblendung beim Wechsel zwischen Galerie und Privacy-Seite */
+        /* Einblenden beim ersten Laden */
         header,
         main,
-        .privacy-page {
-            transition: opacity 180ms ease;
+        .content-page,
+        .notice {
+            transition: opacity 700ms ease;
         }
 
+        body.is-loading header,
+        body.is-loading main,
+        body.is-loading .content-page,
+        body.is-loading .notice {
+            opacity: 0;
+        }
+
+        /* Überblendung beim Seitenwechsel */
         body.is-fading header,
         body.is-fading main,
-        body.is-fading .privacy-page {
+        body.is-fading .content-page {
             opacity: 0;
         }
 
@@ -190,7 +248,8 @@
         @media (prefers-reduced-motion: reduce) {
             header,
             main,
-            .privacy-page {
+            .content-page,
+            .notice {
                 transition: none;
             }
 
@@ -221,26 +280,26 @@
     </style>
 </head>
 
-<body>
+<body class="is-loading">
 
 <div class="notice" id="analytics-notice">
     <p>
         This site uses GoatCounter for visitor statistics.
-        <a href="#privacy">Privacy information</a>
+        <a class="privacy-settings-link" href="#privacy">Privacy settings</a>
     </p>
     <button id="notice-ok" type="button">Okay</button>
 </div>
 
 <header>
-    <h1>KroxenStudios</h1>
+    <img class="logo" src="images/KROX-white.ico" alt="KROX">
+    <p class="subtitle">Game Engine</p>
 
     <p>
-        From the KROX Engine.<br>
         An experimental game engine focused on large-scale landscapes,
         atmosphere and long-distance exploration.
     </p>
 
-    <a class="github-btn"
+    <a class="github-link"
        href="https://github.com/KroxenStudios/KROX"
        target="_blank"
        rel="noopener noreferrer">
@@ -272,24 +331,52 @@
     <footer>
         <p>Pictures: 25.10–28.10.2026</p>
         <p>Copyright © 2026 KroxenStudios, a development branch of KROX.</p>
-        <p><a href="#privacy">Privacy</a></p>
+        <p>
+            <a href="#privacy">Privacy settings</a>
+            &nbsp;·&nbsp;
+            <a href="#contact">Contact</a>
+        </p>
     </footer>
 </main>
 
-<section id="privacy" class="privacy-page" hidden>
+<section id="privacy" class="content-page" hidden>
     <a href="#" class="back-link">← Back to home</a>
 
-    <h1>Privacy</h1>
+    <h1>Privacy settings</h1>
 
     <p>
-        This website uses GoatCounter to count page views and understand
-        how the site is used. GoatCounter is designed to provide
-        privacy-friendly, cookie-free website analytics.
+        This website uses GoatCounter for visitor statistics. The following
+        analytics data is collected:
+    </p>
+
+    <ul>
+        <li>
+            <strong>Sessions:</strong> pageviews from the same visitor are
+            grouped into a session for up to 8 hours.
+        </li>
+        <li>
+            <strong>Country:</strong> the visitor’s country.
+        </li>
+        <li>
+            <strong>Region:</strong> the visitor’s region, where available.
+            The level of detail varies by country.
+        </li>
+        <li>
+            <strong>User-Agent:</strong> the browser and operating system are
+            derived from the User-Agent header. The header itself is not stored.
+        </li>
+    </ul>
+
+    <p>
+        Individual pageviews, referrer information, screen size and language
+        are not collected. If a data-collection setting is disabled, that
+        information is not stored and cannot be recovered later.
     </p>
 
     <p>
-        You can opt out of GoatCounter analytics for this browser below.
-        Your choice is saved in this browser.
+        GoatCounter is designed to provide privacy-friendly, cookie-free
+        website analytics. You can opt out of analytics for this browser
+        below. Your choice is saved in this browser.
     </p>
 
     <button id="analytics-opt-out" type="button">
@@ -308,6 +395,17 @@
     </p>
 </section>
 
+<section id="contact" class="content-page" hidden>
+    <a href="#" class="back-link">← Back to home</a>
+
+    <h1>Contact</h1>
+
+    <p>
+        For inquiries, contact
+        <a href="mailto:KroxenStudios@proton.me">KroxenStudios@proton.me</a>.
+    </p>
+</section>
+
 <script>
     const goatCounterCode = "kroxenstudios";
     const optOutKey = "kroxenstudios-analytics-opt-out";
@@ -315,7 +413,8 @@
 
     const header = document.querySelector("header");
     const main = document.querySelector("main");
-    const privacyPage = document.querySelector(".privacy-page");
+    const privacyPage = document.querySelector("#privacy");
+    const contactPage = document.querySelector("#contact");
     const notice = document.querySelector("#analytics-notice");
     const noticeButton = document.querySelector("#notice-ok");
     const optOutButton = document.querySelector("#analytics-opt-out");
@@ -367,11 +466,12 @@
         document.body.classList.add("is-fading");
 
         setTimeout(() => {
-            const isPrivacyPage = window.location.hash === "#privacy";
+            const page = window.location.hash;
 
-            header.hidden = isPrivacyPage;
-            main.hidden = isPrivacyPage;
-            privacyPage.hidden = !isPrivacyPage;
+            header.hidden = page === "#privacy" || page === "#contact";
+            main.hidden = page === "#privacy" || page === "#contact";
+            privacyPage.hidden = page !== "#privacy";
+            contactPage.hidden = page !== "#contact";
 
             requestAnimationFrame(() => {
                 document.body.classList.remove("is-fading");
@@ -404,6 +504,13 @@
     updateOptOutStatus();
     showPage();
     loadGoatCounter();
+
+    // Startet das Einblenden, sobald der schwarze Hintergrund dargestellt wurde.
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            document.body.classList.remove("is-loading");
+        });
+    });
 </script>
 
 </body>
