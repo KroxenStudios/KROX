@@ -1,151 +1,261 @@
-:root {
-    --bg: #000;
-    --text: #fff;
-    --muted: #aaa;
-    --muted-dark: #888;
-    --border: #333;
-    --border-hover: #555;
-    --button: #111;
-    --button-hover: #1a1a1a;
+/*
+ * Alternatives Design "Leinwand": heller, leicht gebrochener Hintergrund
+ * mit Gewebestruktur, Vignette und Tiefe durch geschichtete Schatten.
+ *
+ * Die Datei ergänzt die Inline-Styles in index.html und wirkt nur,
+ * wenn <html data-theme="canvas"> gesetzt ist. Ohne das Attribut bleibt
+ * das dunkle Standarddesign unverändert.
+ */
+
+html[data-theme="canvas"] {
+    color-scheme: light;
+
+    --bg: #ebe6da;
+    --text: #25211b;
+    --muted: #5f584d;
+    --muted-dark: #7b7365;
+    --border: #cdc5b3;
+    --border-hover: #a89f8b;
+    --button: #f4f0e6;
+    --button-hover: #faf7ef;
+
+    --paper: #f8f5ec;
+    --shadow-rgb: 60 48 28;
+
+    /* Hintergrund: Lichtfall von oben links, abgedunkelte Ränder */
+    background:
+        radial-gradient(ellipse 120% 80% at 25% 0%,
+            rgb(255 252 244 / 85%) 0%,
+            rgb(255 252 244 / 0%) 60%),
+        radial-gradient(ellipse 140% 120% at 50% 50%,
+            rgb(0 0 0 / 0%) 55%,
+            rgb(70 55 30 / 22%) 100%),
+        var(--bg);
+    background-attachment: fixed;
 }
 
-* {
-    box-sizing: border-box;
+html[data-theme="canvas"] body {
+    background: transparent;
 }
 
-html {
-    scroll-behavior: smooth;
+/*
+ * Leinwandstruktur: feines Rauschen plus Kett- und Schussfäden.
+ * Die Textur liegt hinter dem gesamten Inhalt (negativer z-index), damit
+ * sie nicht über die Bilder scheint. Dafür sitzt der Hintergrund auf <html>.
+ */
+html[data-theme="canvas"] body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    mix-blend-mode: multiply;
+    opacity: 0.55;
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.28 0 0 0 0 0.18 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+        repeating-linear-gradient(0deg,
+            rgb(90 70 40 / 9%) 0 1px,
+            transparent 1px 3px),
+        repeating-linear-gradient(90deg,
+            rgb(90 70 40 / 9%) 0 1px,
+            transparent 1px 3px);
 }
 
-body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    line-height: 1.6;
+/* Grobe Unebenheiten wie bei gespannter Leinwand */
+html[data-theme="canvas"] body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.35;
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='b'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.02' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.4 0 0 0 0 0.33 0 0 0 0 0.2 0 0 0 0.6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23b)'/%3E%3C/svg%3E");
 }
 
-header {
-    max-width: 900px;
-    margin: 60px auto;
-    padding: 0 20px;
+html[data-theme="canvas"] ::selection {
+    background: #25211b;
+    color: #f4f0e6;
 }
 
-main {
-    max-width: 900px;
-    margin: auto;
-    padding: 0 20px 60px;
+/* Schwarze Logo-Variante mit transparentem Grund */
+html[data-theme="canvas"] img.logo {
+    content: url("images/KROX-black.png");
+    background: transparent;
+    filter: drop-shadow(0 1px 0 rgb(255 255 255 / 60%));
 }
 
-h1 {
-    margin: 0;
-    font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 600;
+html[data-theme="canvas"] h1 {
+    letter-spacing: -0.01em;
+    text-shadow: 0 1px 0 rgb(255 255 255 / 55%);
 }
 
-p {
-    color: var(--muted);
-    line-height: 1.7;
-}
-
-figure {
-    margin: 0 0 60px;
-}
-
-img {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 6px;
-    background: #111;
-}
-
-figcaption {
-    margin-top: 12px;
+html[data-theme="canvas"] .subtitle {
     color: var(--muted-dark);
-    font-size: 0.95rem;
 }
 
-a {
+/* Bilder ohne Rahmen; Tiefe nur über weich gestaffelte Schatten */
+html[data-theme="canvas"] .frame {
+    background: #d8d1c0;
+    border-radius: 4px;
+    box-shadow:
+        0 1px 2px rgb(var(--shadow-rgb) / 20%),
+        0 8px 16px -4px rgb(var(--shadow-rgb) / 24%),
+        0 28px 48px -14px rgb(var(--shadow-rgb) / 32%);
+}
+
+html[data-theme="canvas"] img {
+    background: #d8d1c0;
+}
+
+/* Bildton: heller, luftiger, etwas weicher im Kontrast */
+html[data-theme="canvas"] .frame img:not(.has-variant) {
+    filter: brightness(1.1) contrast(0.93) saturate(0.9) sepia(0.06);
+}
+
+@media (hover: hover) {
+    html[data-theme="canvas"] .frame:hover img:not(.has-variant) {
+        filter: none;
+    }
+}
+
+html[data-theme="canvas"] figcaption {
+    margin-top: 20px;
+    color: var(--muted-dark);
+    font-style: italic;
+    text-align: center;
+}
+
+html[data-theme="canvas"] a {
+    text-decoration-color: rgb(37 33 27 / 35%);
+    text-underline-offset: 3px;
+}
+
+html[data-theme="canvas"] a:hover {
+    text-decoration-color: currentColor;
+}
+
+html[data-theme="canvas"] a:focus-visible,
+html[data-theme="canvas"] button:focus-visible,
+html[data-theme="canvas"] select:focus-visible {
+    outline-color: var(--text);
+}
+
+/* Karten-Buttons, leicht erhaben */
+html[data-theme="canvas"] button {
+    background: linear-gradient(180deg, #faf7ef, var(--button));
+    border-color: var(--border);
+    color: var(--text);
+    box-shadow:
+        0 1px 0 rgb(255 255 255 / 80%) inset,
+        0 1px 2px rgb(var(--shadow-rgb) / 20%),
+        0 4px 8px -4px rgb(var(--shadow-rgb) / 25%);
+}
+
+html[data-theme="canvas"] button:hover {
+    background: linear-gradient(180deg, #fffdf8, var(--button-hover));
+    border-color: var(--border-hover);
+}
+
+html[data-theme="canvas"] button:active {
+    box-shadow:
+        0 1px 3px rgb(var(--shadow-rgb) / 30%) inset;
+}
+
+html[data-theme="canvas"] .github-link:hover,
+html[data-theme="canvas"] .back-link:hover,
+html[data-theme="canvas"] footer a:hover {
     color: var(--text);
 }
 
-.github-btn {
-    display: inline-block;
-    margin-top: 16px;
-    padding: 10px 16px;
+html[data-theme="canvas"] footer,
+html[data-theme="canvas"] footer p {
+    color: #8a8272;
+}
+
+html[data-theme="canvas"] footer a {
+    color: #6e6657;
+}
+
+html[data-theme="canvas"] .privacy-settings-link {
     background: var(--button);
-    border: 1px solid var(--border);
-    border-radius: 6px;
+    border-color: var(--border);
     color: var(--text);
-    text-decoration: none;
-    transition: 0.15s ease;
 }
 
-.github-btn:hover {
+html[data-theme="canvas"] .privacy-settings-link:hover {
     background: var(--button-hover);
     border-color: var(--border-hover);
 }
 
-footer {
-    color: #666;
-    font-size: 0.9rem;
-    margin-top: 16px;
+/* Fortschrittsbalken */
+html[data-theme="canvas"] .progress {
+    background: var(--text);
+    opacity: 0.6;
 }
 
-footer:last-child {
-    margin-bottom: 40px;
+/* Hinweisleiste und Sprachumschalter als Papierstreifen */
+html[data-theme="canvas"] .notice {
+    background: #f4f0e6;
+    border-top-color: var(--border);
+    box-shadow:
+        0 -1px 0 rgb(255 255 255 / 70%),
+        0 -10px 30px -8px rgb(var(--shadow-rgb) / 30%);
 }
 
-/* Privacy-Seite */
-.privacy-page {
-    max-width: 900px;
-    margin: 60px auto;
-    padding: 0 20px 60px;
+html[data-theme="canvas"] .lang-switch {
+    background: rgb(244 240 230 / 80%);
+    border-color: var(--border);
+    box-shadow:
+        0 1px 0 rgb(255 255 255 / 70%) inset,
+        0 6px 16px -6px rgb(var(--shadow-rgb) / 35%);
 }
 
-.back-link {
-    display: inline-block;
-    margin-bottom: 24px;
+html[data-theme="canvas"] .lang-switch select,
+html[data-theme="canvas"] .lang-switch button {
+    color: var(--muted);
+    background: transparent;
+    box-shadow: none;
+    border: 0;
 }
 
-/* Überblendung beim Wechsel der Seiten */
-header,
-main,
-.privacy-page {
-    transition: opacity 180ms ease;
+html[data-theme="canvas"] .lang-switch select:hover,
+html[data-theme="canvas"] .lang-switch button:hover {
+    color: var(--text);
+    background: transparent;
 }
 
-body.is-fading header,
-body.is-fading main,
-body.is-fading .privacy-page {
-    opacity: 0;
+html[data-theme="canvas"] .lang-switch option {
+    background: #f4f0e6;
+    color: #25211b;
 }
 
-/* Sorgt dafür, dass hidden-Elemente wirklich ausgeblendet bleiben */
-[hidden] {
-    display: none !important;
+/* Umschalter für das Design */
+.theme-toggle {
+    display: none;
 }
 
-/* Animation für Nutzer deaktivieren, die reduzierte Bewegung bevorzugen */
-@media (prefers-reduced-motion: reduce) {
-    header,
-    main,
-    .privacy-page {
-        transition: none;
-    }
+body.js-enabled .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border: 0;
+    border-left: 1px solid var(--border);
+    border-radius: 0 999px 999px 0;
+    background: transparent;
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.4;
 }
 
-@media (max-width: 768px) {
-    header {
-        margin: 40px auto;
-    }
+body.js-enabled .theme-toggle:hover {
+    background: transparent;
+    color: var(--text);
+}
 
-    figure {
-        margin-bottom: 40px;
-    }
-
-    figcaption {
-        font-size: 0.9rem;
+@media print {
+    html[data-theme="canvas"] body::before,
+    html[data-theme="canvas"] body::after {
+        display: none;
     }
 }

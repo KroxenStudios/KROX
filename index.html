@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
 
     <title>KROX - Game Engine</title>
-    <link rel="icon" href="images/KROX-white.ico" type="image/x-icon">
+    <link rel="icon" href="images/KROX-black.ico" type="image/x-icon">
+    <link rel="icon" href="images/KROX-white.ico" type="image/x-icon" media="(prefers-color-scheme: dark)">
 
     <style>
         :root {
@@ -17,6 +19,18 @@
             --border-hover: #555;
             --button: #111;
             --button-hover: #1a1a1a;
+            --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* Dauer des Designwechsels, gilt für Seite und Bilder gleichermaßen */
+        :root {
+            --theme-fade: 700ms;
+        }
+
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+            animation-duration: var(--theme-fade);
+            animation-timing-function: ease;
         }
 
         * {
@@ -33,6 +47,12 @@
             color: var(--text);
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::selection {
+            background: #fff;
+            color: #000;
         }
 
         header,
@@ -74,13 +94,11 @@
             margin-top: 0;
             color: var(--muted-dark);
             font-size: 1.1rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
         }
 
-        p {
-            color: var(--muted);
-            line-height: 1.7;
-        }
-
+        p,
         li {
             color: var(--muted);
             line-height: 1.7;
@@ -90,30 +108,10 @@
             margin: 0 0 60px;
         }
 
-        /*
-         * Ohne JavaScript sind die Bilder sofort sichtbar.
-         * Animationen werden nur mit der Klasse .js-enabled eingeschaltet.
-         */
-        figure.slide-in {
-            opacity: 1;
-            transform: none;
-        }
-
-        body.js-enabled figure.slide-in {
-            opacity: 0;
-            transform: translateX(-60px);
-            transition:
-                opacity 1800ms ease,
-                transform 1800ms cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        body.js-enabled figure.slide-in:nth-of-type(even) {
-            transform: translateX(60px);
-        }
-
-        body.js-enabled figure.slide-in.is-visible {
-            opacity: 1;
-            transform: translateX(0);
+        .frame {
+            overflow: hidden;
+            border-radius: 6px;
+            background: #111;
         }
 
         img {
@@ -124,15 +122,115 @@
             background: #111;
         }
 
+        .frame img {
+            transition: transform 1200ms var(--ease-out), filter 600ms ease;
+        }
+
+        /*
+         * Bildton passend zum Design: im dunklen Design etwas abgedunkelt
+         * und kontrastreicher, im hellen (styles.css) aufgehellt. Beim
+         * Darüberfahren erscheint das Bild im Originalton.
+         */
+        .frame img:not(.has-variant) {
+            filter: brightness(0.82) contrast(1.08) saturate(1.05);
+        }
+
+        @media (hover: hover) {
+            .frame:hover img {
+                transform: scale(1.03);
+            }
+
+            .frame:hover img:not(.has-variant) {
+                filter: none;
+            }
+        }
+
+        /* Nach 1,5 s Hover blendet das Overlay die Variante des anderen Designs ein. */
+        .frame {
+            position: relative;
+        }
+
+        .frame img.alt-overlay {
+            position: absolute;
+            inset: 0;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 1200ms var(--ease-out), opacity 600ms ease;
+        }
+
+        .frame img.alt-overlay.show {
+            opacity: 1;
+        }
+
         figcaption {
             margin-top: 12px;
             color: var(--muted-dark);
             font-size: 0.95rem;
         }
 
+        figcaption:empty {
+            display: none;
+        }
+
         a {
             color: var(--text);
         }
+
+        a:focus-visible,
+        button:focus-visible {
+            outline: 2px solid var(--text);
+            outline-offset: 3px;
+            border-radius: 4px;
+        }
+
+        /*
+         * Ohne JavaScript sind alle Inhalte sofort sichtbar.
+         * Animationen werden nur mit der Klasse .js-enabled eingeschaltet.
+         */
+        figure.slide-in {
+            opacity: 1;
+            transform: none;
+        }
+
+        body.js-enabled figure.slide-in {
+            opacity: 0;
+            transform: translateX(-60px);
+            filter: blur(8px);
+            transition:
+                opacity 1600ms ease,
+                filter 1600ms ease,
+                transform 1800ms var(--ease-out);
+        }
+
+        body.js-enabled figure.slide-in:nth-of-type(even) {
+            transform: translateX(60px);
+        }
+
+        body.js-enabled figure.slide-in.is-visible {
+            opacity: 1;
+            filter: blur(0);
+            transform: translateX(0);
+        }
+
+        /* Einblenden des Seitenkopfs, gestaffelt */
+        body.js-enabled header > * {
+            opacity: 0;
+            transform: translateY(14px);
+            transition:
+                opacity 900ms ease,
+                transform 900ms var(--ease-out),
+                color 1800ms ease;
+        }
+
+        body.js-enabled.intro-start header > * {
+            opacity: 1;
+            transform: none;
+        }
+
+        body.js-enabled header > :nth-child(2) { transition-delay: 150ms; }
+        body.js-enabled header > :nth-child(3) { transition-delay: 300ms; }
 
         .github-link {
             display: inline-block;
@@ -142,22 +240,24 @@
             text-decoration: none;
         }
 
+        .github-link span {
+            display: inline-block;
+            transition: transform 300ms var(--ease-out);
+        }
+
+        .github-link:hover span {
+            transform: translateX(5px);
+        }
+
         body.js-enabled .github-link {
-            opacity: 0;
             visibility: hidden;
-            transition:
-                opacity 700ms ease,
-                color 1800ms ease,
-                visibility 0s linear 700ms;
         }
 
         body.js-enabled.intro-complete .github-link {
-            opacity: 1;
             visibility: visible;
-            transition:
-                opacity 700ms ease,
-                color 1800ms ease,
-                visibility 0s;
+            opacity: 1;
+            transform: none;
+            transition-delay: 0s;
         }
 
         .github-link:hover {
@@ -197,6 +297,18 @@
 
         .content-page:target {
             display: block;
+            animation: page-in 600ms var(--ease-out) both;
+        }
+
+        @keyframes page-in {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
         }
 
         body:has(.content-page:target) header,
@@ -224,11 +336,72 @@
             color: var(--text);
             font: inherit;
             cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease,
+                transform 0.15s ease;
         }
 
         button:hover {
             background: var(--button-hover);
             border-color: var(--border-hover);
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+        /* Fortschrittsanzeige beim Scrollen (nur mit JavaScript) */
+        .progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1100;
+            width: 100%;
+            height: 2px;
+            background: var(--text);
+            opacity: 0.7;
+            transform: scaleX(0);
+            transform-origin: left;
+            pointer-events: none;
+        }
+
+        /* Sprachumschalter */
+        .lang-switch {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 1050;
+            display: none;
+            gap: 2px;
+            padding: 3px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgb(0 0 0 / 60%);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        body.js-enabled .lang-switch {
+            display: flex;
+        }
+
+        .lang-switch select {
+            padding: 3px 10px;
+            border: 0;
+            border-radius: 999px;
+            background: transparent;
+            color: var(--muted);
+            font: inherit;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .lang-switch select:hover {
+            color: var(--text);
+        }
+
+        .lang-switch option {
+            background: #111;
+            color: #fff;
         }
 
         /*
@@ -253,6 +426,18 @@
 
         body.js-enabled .notice {
             display: flex;
+            animation: notice-in 700ms var(--ease-out) 1200ms both;
+        }
+
+        @keyframes notice-in {
+            from {
+                opacity: 0;
+                transform: translateY(100%);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
         }
 
         .notice p {
@@ -295,19 +480,33 @@
 
             body.js-enabled figure.slide-in,
             body.js-enabled figure.slide-in:nth-of-type(even),
-            body.js-enabled .github-link {
+            body.js-enabled header > *,
+            body.js-enabled .notice,
+            .content-page:target,
+            .frame img {
                 transition: none;
+                animation: none;
             }
 
-            body.js-enabled figure.slide-in {
+            body.js-enabled figure.slide-in,
+            body.js-enabled header > * {
                 opacity: 1;
                 transform: none;
+                filter: none;
+            }
+
+            .frame:hover img {
+                transform: none;
+            }
+
+            .progress {
+                display: none;
             }
         }
 
         @media (max-width: 768px) {
             header {
-                margin-top: 40px;
+                margin-top: 56px;
                 margin-bottom: 40px;
             }
 
@@ -325,23 +524,60 @@
             }
         }
     </style>
+
+    <!-- Alternatives Design "Leinwand"; wirkt nur bei data-theme="canvas" -->
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        /* Früh gesetzt, damit beim Laden nichts aufblitzt. */
+        /* Ohne gespeicherte Wahl folgt das Design dem System. */
+        (function () {
+            let theme = null;
+            try {
+                theme = localStorage.getItem("kroxenstudios-theme");
+            } catch {}
+
+            if (theme !== "canvas" && theme !== "dark") {
+                theme = window.matchMedia &&
+                    matchMedia("(prefers-color-scheme: light)").matches
+                    ? "canvas" : "dark";
+            }
+
+            document.documentElement.dataset.theme = theme;
+        })();
+    </script>
 </head>
 
 <body>
 
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<div class="lang-switch" role="group" aria-label="Language / Sprache">
+    <select id="lang-select" aria-label="Language / Sprache">
+        <option value="en">English</option>
+        <option value="de">Deutsch</option>
+        <option value="fr">Français</option>
+        <option value="es">Español</option>
+        <option value="it">Italiano</option>
+        <option value="pt">Português</option>
+        <option value="nl">Nederlands</option>
+        <option value="pl">Polski</option>
+    </select>
+    <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Theme" title="Dark / Canvas">◐</button>
+</div>
+
 <div class="notice" id="analytics-notice">
     <p>
-        This site uses GoatCounter for visitor statistics.
-        <a class="privacy-settings-link" href="#privacy">Privacy settings</a>
+        <span data-i18n="notice.text">This site uses GoatCounter for visitor statistics.</span>
+        <a class="privacy-settings-link" href="#privacy" data-i18n="privacy.link">Privacy settings</a>
     </p>
-    <button id="notice-ok" type="button">Okay</button>
+    <button id="notice-ok" type="button" data-i18n="notice.ok">Okay</button>
 </div>
 
 <header>
     <img class="logo" src="images/KROX-white.ico" alt="KROX">
     <p class="subtitle">Game Engine</p>
 
-    <p>
+    <p data-i18n="intro">
         An experimental game engine focused on large-scale landscapes,
         atmosphere and long-distance exploration.
     </p>
@@ -349,76 +585,69 @@
     <a class="github-link"
        href="https://github.com/KroxenStudios/KROX"
        target="_blank"
-       rel="noopener noreferrer">
-        GitHub Repository →
-    </a>
+       rel="noopener noreferrer"><span data-i18n="github">GitHub Repository</span> <span aria-hidden="true">→</span></a>
 </header>
 
 <main>
     <figure class="slide-in">
-        <img src="images/01.png" alt="01">
+        <div class="frame"><img src="images/01.png" data-variant="01" alt="Golden Hour" data-i18n-alt="img1" loading="lazy"></div>
         <figcaption></figcaption>
     </figure>
 
     <figure class="slide-in">
-        <img src="images/02.png" alt="02">
+        <div class="frame"><img src="images/02.png" data-variant="02" alt="Blue Hour" data-i18n-alt="img2" loading="lazy"></div>
         <figcaption></figcaption>
     </figure>
 
     <figure class="slide-in">
-        <img src="images/03.png" alt="03">
-        <figcaption></figcaption>
-    </figure>
-
-    <figure class="slide-in">
-        <img src="images/04.png" alt="04">
+        <div class="frame"><img src="images/03.png" data-variant="03" alt="" loading="lazy"></div>
         <figcaption></figcaption>
     </figure>
 
     <footer>
-        <p>Pictures: 25.10–29.10.2026</p>
-        <p>Copyright © 2026 KroxenStudios, a development branch of KROX.</p>
+        <p data-i18n="footer.pictures">Pictures: 25.10–28.10.2026</p>
+        <p data-i18n="footer.copyright">Copyright © 2026 KroxenStudios, a development branch of KROX.</p>
         <p>
-            <a href="#privacy">Privacy settings</a>
+            <a href="#privacy" data-i18n="privacy.link">Privacy settings</a>
             &nbsp;·&nbsp;
-            <a href="#contact">Contact</a>
+            <a href="#contact" data-i18n="contact.link">Contact</a>
         </p>
     </footer>
 </main>
 
 <section id="privacy" class="content-page">
-    <a href="#" class="back-link">← Back to home</a>
+    <a href="#" class="back-link" data-i18n="back">← Back to home</a>
 
-    <h1>Privacy settings</h1>
+    <h1 data-i18n="privacy.title">Privacy settings</h1>
 
-    <p>
+    <p data-i18n="privacy.intro">
         This website uses GoatCounter for visitor statistics. The following
         analytics data is collected:
     </p>
 
     <ul>
-        <li>
+        <li data-i18n-html="privacy.sessions">
             <strong>Sessions:</strong> pageviews from the same visitor are
             grouped into a session for up to 8 hours.
         </li>
-        <li>
+        <li data-i18n-html="privacy.country">
             <strong>Country:</strong> the visitor’s country.
         </li>
-        <li>
+        <li data-i18n-html="privacy.region">
             <strong>Region:</strong> the visitor’s region, where available.
             The level of detail varies by country.
         </li>
-        <li>
+        <li data-i18n-html="privacy.ua">
             <strong>User-Agent:</strong> the browser and operating system are
             derived from the User-Agent header. The header itself is not stored.
         </li>
-        <li>
+        <li data-i18n-html="privacy.lang">
             <strong>Language:</strong> the visitor’s preferred language is derived from the language information sent by the browser.
             Only the language is stored, not the original header.
         </li>
     </ul>
 
-    <p>
+    <p data-i18n="privacy.optout.text">
         GoatCounter is designed to provide privacy-friendly, cookie-free
         website analytics. You can opt out of analytics for this browser
         below. Your choice is saved in this browser.
@@ -430,7 +659,7 @@
 
     <p id="opt-out-status" aria-live="polite"></p>
 
-    <p>
+    <p data-i18n-html="privacy.more">
         For more information, see
         <a href="https://goatcounter.com/help/privacy"
            target="_blank"
@@ -441,11 +670,11 @@
 </section>
 
 <section id="contact" class="content-page">
-    <a href="#" class="back-link">← Back to home</a>
+    <a href="#" class="back-link" data-i18n="back">← Back to home</a>
 
-    <h1>Contact</h1>
+    <h1 data-i18n="contact.title">Contact</h1>
 
-    <p>
+    <p data-i18n-html="contact.text">
         For inquiries, contact
         <a href="mailto:KroxenStudios@proton.me">KroxenStudios@proton.me</a>.
     </p>
@@ -453,7 +682,7 @@
 
 <script>
     /*
-     * Die Seite funktioniert auch ohne dieses Script.
+     * Die Seite funktioniert auch ohne dieses Script (Englisch).
      * Diese Klasse aktiviert lediglich die optionalen Effekte.
      */
     document.body.classList.add("js-enabled");
@@ -461,11 +690,309 @@
     const goatCounterCode = "kroxenstudios";
     const optOutKey = "kroxenstudios-analytics-opt-out";
     const noticeKey = "kroxenstudios-analytics-notice-dismissed";
+    const langKey = "kroxenstudios-language";
 
+    const langSelect = document.querySelector("#lang-select");
     const notice = document.querySelector("#analytics-notice");
     const noticeButton = document.querySelector("#notice-ok");
     const optOutButton = document.querySelector("#analytics-opt-out");
     const optOutStatus = document.querySelector("#opt-out-status");
+
+    /*
+     * Übersetzungen. Englisch steht zusätzlich im HTML, damit die Seite
+     * ohne JavaScript vollständig bleibt. Die deutschen Texte sind frei
+     * formuliert und keine Wort-für-Wort-Übersetzung.
+     */
+    const translations = {
+        en: {
+            "title": "KROX - Game Engine",
+            "intro": "An experimental game engine focused on large-scale landscapes, atmosphere and long-distance exploration.",
+            "github": "GitHub Repository",
+            "img1": "Golden Hour",
+            "img2": "Blue Hour",
+            "img4": "Water",
+            "img5": "River valley, day and dusk",
+            "notice.text": "This site uses GoatCounter for visitor statistics.",
+            "notice.ok": "Okay",
+            "privacy.link": "Privacy settings",
+            "contact.link": "Contact",
+            "footer.pictures": "Pictures: 25.10–29.10.2026",
+            "footer.copyright": "Copyright © 2026 KroxenStudios, a development branch of KROX.",
+            "back": "← Back to home",
+            "privacy.title": "Privacy settings",
+            "privacy.intro": "This website uses GoatCounter for visitor statistics. The following analytics data is collected:",
+            "privacy.sessions": "<strong>Sessions:</strong> pageviews from the same visitor are grouped into a session for up to 8 hours.",
+            "privacy.country": "<strong>Country:</strong> the visitor’s country.",
+            "privacy.region": "<strong>Region:</strong> the visitor’s region, where available. The level of detail varies by country.",
+            "privacy.ua": "<strong>User-Agent:</strong> the browser and operating system are derived from the User-Agent header. The header itself is not stored.",
+            "privacy.lang": "<strong>Language:</strong> the visitor’s preferred language is derived from the language information sent by the browser. Only the language is stored, not the original header.",
+            "privacy.optout.text": "GoatCounter is designed to provide privacy-friendly, cookie-free website analytics. You can opt out of analytics for this browser below. Your choice is saved in this browser.",
+            "privacy.more": "For more information, see <a href=\"https://goatcounter.com/help/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">GoatCounter’s privacy information</a>.",
+            "optout.button": "Opt out of analytics",
+            "optin.button": "Opt out is enabled — click to opt in",
+            "optout.status": "Analytics is disabled in this browser.",
+            "contact.title": "Contact",
+            "contact.text": "For inquiries, contact <a href=\"mailto:KroxenStudios@proton.me\">KroxenStudios@proton.me</a>."
+        },
+        de: {
+            "title": "KROX – Game Engine",
+            "intro": "Eine experimentelle Game Engine für riesige Landschaften, stimmungsvolle Atmosphäre und Reisen über weite Strecken.",
+            "github": "GitHub-Repository",
+            "img1": "Goldene Stunde",
+            "img2": "Blaue Stunde",
+            "img4": "Wasser",
+            "img5": "Flusstal – bei Tag und in der Dämmerung",
+            "notice.text": "Diese Seite nutzt GoatCounter, um Besucherzahlen auszuwerten.",
+            "notice.ok": "Verstanden",
+            "privacy.link": "Datenschutz-Einstellungen",
+            "contact.link": "Kontakt",
+            "footer.pictures": "Bilder: 25.–28.10.2026",
+            "footer.copyright": "© 2026 KroxenStudios, ein Entwicklungszweig von KROX.",
+            "back": "← Zurück zur Startseite",
+            "privacy.title": "Datenschutz-Einstellungen",
+            "privacy.intro": "Diese Website nutzt GoatCounter, um Besucherzahlen auszuwerten. Dabei werden folgende Daten erfasst:",
+            "privacy.sessions": "<strong>Sitzungen:</strong> Seitenaufrufe desselben Besuchers werden bis zu 8 Stunden lang zu einer Sitzung zusammengefasst.",
+            "privacy.country": "<strong>Land:</strong> das Land, aus dem der Besuch kommt.",
+            "privacy.region": "<strong>Region:</strong> die Region des Besuchers, sofern verfügbar. Wie genau sie ist, hängt vom jeweiligen Land ab.",
+            "privacy.ua": "<strong>User-Agent:</strong> Browser und Betriebssystem werden aus dem User-Agent-Header abgeleitet. Der Header selbst wird nicht gespeichert.",
+            "privacy.lang": "<strong>Sprache:</strong> die bevorzugte Sprache wird aus den Angaben des Browsers abgeleitet. Gespeichert wird nur die Sprache, nicht der ursprüngliche Header.",
+            "privacy.optout.text": "GoatCounter ist auf datensparsame Statistiken ohne Cookies ausgelegt. Hier können Sie die Auswertung für diesen Browser ausschalten. Ihre Entscheidung wird in diesem Browser gespeichert.",
+            "privacy.more": "Mehr dazu finden Sie in den <a href=\"https://goatcounter.com/help/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">Datenschutzinformationen von GoatCounter</a> (englisch).",
+            "optout.button": "Statistik ausschalten",
+            "optin.button": "Statistik ist aus — hier wieder einschalten",
+            "optout.status": "In diesem Browser ist die Statistik ausgeschaltet.",
+            "contact.title": "Kontakt",
+            "contact.text": "Bei Fragen erreichen Sie uns unter <a href=\"mailto:KroxenStudios@proton.me\">KroxenStudios@proton.me</a>."
+        },
+        fr: {
+            "intro": "Un moteur de jeu expérimental dédié aux paysages immenses, aux ambiances atmosphériques et à l’exploration au long cours.",
+            "github": "Dépôt GitHub",
+            "img1": "Heure dorée",
+            "img2": "Heure bleue",
+            "img4": "Eau",
+            "img5": "Vallée fluviale, de jour comme au crépuscule",
+            "notice.text": "Ce site utilise GoatCounter pour mesurer sa fréquentation.",
+            "notice.ok": "Compris",
+            "privacy.link": "Paramètres de confidentialité",
+            "contact.link": "Contact",
+            "footer.pictures": "Images : 25.10–28.10.2026",
+            "footer.copyright": "© 2026 KroxenStudios, une branche de développement de KROX.",
+            "back": "← Retour à l’accueil",
+            "privacy.title": "Paramètres de confidentialité",
+            "privacy.intro": "Ce site utilise GoatCounter pour mesurer sa fréquentation. Les données suivantes sont collectées :",
+            "privacy.sessions": "<strong>Sessions :</strong> les pages vues d’un même visiteur sont regroupées en une session pouvant durer jusqu’à 8 heures.",
+            "privacy.country": "<strong>Pays :</strong> le pays du visiteur.",
+            "privacy.region": "<strong>Région :</strong> la région du visiteur, lorsqu’elle est disponible. Le niveau de détail varie selon les pays.",
+            "privacy.ua": "<strong>User-Agent :</strong> le navigateur et le système d’exploitation sont déduits de l’en-tête User-Agent, qui n’est lui-même pas conservé.",
+            "privacy.lang": "<strong>Langue :</strong> la langue préférée est déduite des informations transmises par le navigateur. Seule la langue est conservée, pas l’en-tête d’origine.",
+            "privacy.optout.text": "GoatCounter propose des statistiques respectueuses de la vie privée, sans cookies. Vous pouvez désactiver la mesure d’audience pour ce navigateur ci-dessous. Votre choix est enregistré dans ce navigateur.",
+            "privacy.more": "Pour en savoir plus, consultez les <a href=\"https://goatcounter.com/help/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">informations de GoatCounter sur la confidentialité</a> (en anglais).",
+            "optout.button": "Désactiver la mesure d’audience",
+            "optin.button": "Mesure désactivée — cliquer pour la réactiver",
+            "optout.status": "La mesure d’audience est désactivée dans ce navigateur.",
+            "contact.title": "Contact",
+            "contact.text": "Pour toute question, écrivez-nous à <a href=\"mailto:KroxenStudios@proton.me\">KroxenStudios@proton.me</a>."
+        },
+        es: {
+            "intro": "Un motor de juego experimental centrado en paisajes inmensos, atmósferas envolventes y exploración a larga distancia.",
+            "github": "Repositorio de GitHub",
+            "img1": "Hora dorada",
+            "img2": "Hora azul",
+            "img4": "Agua",
+            "img5": "Valle fluvial, de día y al anochecer",
+            "notice.text": "Este sitio usa GoatCounter para contar las visitas.",
+            "notice.ok": "Entendido",
+            "privacy.link": "Ajustes de privacidad",
+            "contact.link": "Contacto",
+            "footer.pictures": "Imágenes: 25.10–28.10.2026",
+            "footer.copyright": "© 2026 KroxenStudios, una rama de desarrollo de KROX.",
+            "back": "← Volver al inicio",
+            "privacy.title": "Ajustes de privacidad",
+            "privacy.intro": "Este sitio web usa GoatCounter para contar las visitas. Se recogen los siguientes datos:",
+            "privacy.sessions": "<strong>Sesiones:</strong> las visitas de una misma persona se agrupan en una sesión de hasta 8 horas.",
+            "privacy.country": "<strong>País:</strong> el país del visitante.",
+            "privacy.region": "<strong>Región:</strong> la región del visitante, si está disponible. El nivel de detalle depende del país.",
+            "privacy.ua": "<strong>User-Agent:</strong> el navegador y el sistema operativo se deducen de la cabecera User-Agent, que no se guarda.",
+            "privacy.lang": "<strong>Idioma:</strong> el idioma preferido se deduce de la información que envía el navegador. Solo se guarda el idioma, no la cabecera original.",
+            "privacy.optout.text": "GoatCounter ofrece estadísticas respetuosas con la privacidad y sin cookies. Abajo puede desactivarlas para este navegador. Su elección se guarda en este navegador.",
+            "privacy.more": "Más información en la <a href=\"https://goatcounter.com/help/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">página de privacidad de GoatCounter</a> (en inglés).",
+            "optout.button": "Desactivar las estadísticas",
+            "optin.button": "Estadísticas desactivadas — pulse para reactivarlas",
+            "optout.status": "Las estadísticas están desactivadas en este navegador.",
+            "contact.title": "Contacto",
+            "contact.text": "Para cualquier consulta, escríbanos a <a href=\"mailto:KroxenStudios@proton.me\">KroxenStudios@proton.me</a>."
+        },
+        it: {
+            "intro": "Un motore di gioco sperimentale dedicato a paesaggi sconfinati, atmosfere suggestive ed esplorazione su lunghe distanze.",
+            "github": "Repository GitHub",
+            "img1": "Ora d’oro",
+            "img2": "Ora blu",
+            "img4": "Acqua",
+            "img5": "Valle fluviale, di giorno e al crepuscolo",
+            "notice.text": "Questo sito usa GoatCounter per le statistiche sulle visite.",
+            "notice.ok": "Ho capito",
+            "privacy.link": "Impostazioni privacy",
+            "contact.link": "Contatti",
+            "footer.pictures": "Immagini: 25.10–28.10.2026",
+            "footer.copyright": "© 2026 KroxenStudios, un ramo di sviluppo di KROX.",
+            "back": "← Torna alla home",
+            "privacy.title": "Impostazioni privacy",
+            "privacy.intro": "Questo sito usa GoatCounter per le statistiche sulle visite. Vengono raccolti i seguenti dati:",
+            "privacy.sessions": "<strong>Sessioni:</strong> le visualizzazioni dello stesso visitatore vengono raggruppate in una sessione della durata massima di 8 ore.",
+            "privacy.country": "<strong>Paese:</strong> il paese del visitatore.",
+            "privacy.region": "<strong>Regione:</strong> la regione del visitatore, se disponibile. Il livello di dettaglio varia da paese a paese.",
+            "privacy.ua": "<strong>User-Agent:</strong> browser e sistema operativo vengono ricavati dall’intestazione User-Agent, che non viene memorizzata.",
+            "privacy.lang": "<strong>Lingua:</strong> la lingua preferita viene ricavata dalle informazioni inviate dal browser. Si salva solo la lingua, non l’intestazione originale.",
+            "privacy.optout.text": "GoatCounter offre statistiche rispettose della privacy e senza cookie. Qui sotto puoi disattivarle per questo browser. La tua scelta viene salvata in questo browser.",
+            "privacy.more": "Per saperne di più, consulta le <a href=\"https://goatcounter.com/help/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">informazioni sulla privacy di GoatCounter</a> (in inglese).",
+            "optout.button": "Disattiva le statistiche",
+            "optin.button": "Statistiche disattivate — clicca per riattivarle",
+            "optout.status": "Le statistiche sono disattivate in questo browser.",
+            "contact.title": "Contatti",
+            "contact.text": "Per qualsiasi domanda scrivici a <a href=\"mailto:KroxenStudios@proton.me\">KroxenStudios@proton.me</a>."
+        },
+        pt: {
+            "intro": "Um motor de jogo experimental focado em paisagens imensas, atmosferas marcantes e exploração de longas distâncias.",
+            "github": "Repositório no GitHub",
+            "img1": "Hora dourada",
+            "img2": "Hora azul",
+            "img4": "Água",
+            "img5": "Vale fluvial, de dia e ao entardecer",
+            "notice.text": "Este site usa o GoatCounter para estatísticas de visitas.",
+            "notice.ok": "Entendi",
+            "privacy.link": "Definições de privacidade",
+            "contact.link": "Contacto",
+            "footer.pictures": "Imagens: 25.10–28.10.2026",
+            "footer.copyright": "© 2026 KroxenStudios, um ramo de desenvolvimento da KROX.",
+            "back": "← Voltar ao início",
+            "privacy.title": "Definições de privacidade",
+            "privacy.intro": "Este site usa o GoatCounter para estatísticas de visitas. São recolhidos os seguintes dados:",
+            "privacy.sessions": "<strong>Sessões:</strong> as visualizações do mesmo visitante são agrupadas numa sessão de até 8 horas.",
+            "privacy.country": "<strong>País:</strong> o país do visitante.",
+            "privacy.region": "<strong>Região:</strong> a região do visitante, quando disponível. O nível de detalhe varia consoante o país.",
+            "privacy.ua": "<strong>User-Agent:</strong> o navegador e o sistema operativo são deduzidos do cabeçalho User-Agent, que não é guardado.",
+            "privacy.lang": "<strong>Idioma:</strong> o idioma preferido é deduzido das informações enviadas pelo navegador. Apenas o idioma é guardado, não o cabeçalho original.",
+            "privacy.optout.text": "O GoatCounter oferece estatísticas que respeitam a privacidade, sem cookies. Abaixo pode desativá-las neste navegador. A sua escolha fica guardada neste navegador.",
+            "privacy.more": "Saiba mais nas <a href=\"https://goatcounter.com/help/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">informações de privacidade do GoatCounter</a> (em inglês).",
+            "optout.button": "Desativar as estatísticas",
+            "optin.button": "Estatísticas desativadas — clique para reativar",
+            "optout.status": "As estatísticas estão desativadas neste navegador.",
+            "contact.title": "Contacto",
+            "contact.text": "Para qualquer questão, escreva-nos para <a href=\"mailto:KroxenStudios@proton.me\">KroxenStudios@proton.me</a>."
+        },
+        nl: {
+            "intro": "Een experimentele game-engine voor uitgestrekte landschappen, sfeervolle atmosferen en verkenning over lange afstanden.",
+            "github": "GitHub-repository",
+            "img1": "Gouden uur",
+            "img2": "Blauwe uur",
+            "img4": "Water",
+            "img5": "Riviervallei, overdag en in de schemering",
+            "notice.text": "Deze site gebruikt GoatCounter voor bezoekersstatistieken.",
+            "notice.ok": "Oké",
+            "privacy.link": "Privacy-instellingen",
+            "contact.link": "Contact",
+            "footer.pictures": "Beelden: 25.10–28.10.2026",
+            "footer.copyright": "© 2026 KroxenStudios, een ontwikkeltak van KROX.",
+            "back": "← Terug naar home",
+            "privacy.title": "Privacy-instellingen",
+            "privacy.intro": "Deze website gebruikt GoatCounter voor bezoekersstatistieken. De volgende gegevens worden verzameld:",
+            "privacy.sessions": "<strong>Sessies:</strong> paginaweergaven van dezelfde bezoeker worden tot maximaal 8 uur samengevoegd tot één sessie.",
+            "privacy.country": "<strong>Land:</strong> het land van de bezoeker.",
+            "privacy.region": "<strong>Regio:</strong> de regio van de bezoeker, voor zover beschikbaar. Hoe nauwkeurig dit is, verschilt per land.",
+            "privacy.ua": "<strong>User-Agent:</strong> browser en besturingssysteem worden afgeleid uit de User-Agent-header. De header zelf wordt niet opgeslagen.",
+            "privacy.lang": "<strong>Taal:</strong> de voorkeurstaal wordt afgeleid uit de gegevens van de browser. Alleen de taal wordt opgeslagen, niet de oorspronkelijke header.",
+            "privacy.optout.text": "GoatCounter is ontworpen voor privacyvriendelijke statistieken zonder cookies. Hieronder kunt u de statistieken voor deze browser uitschakelen. Uw keuze wordt in deze browser opgeslagen.",
+            "privacy.more": "Meer informatie vindt u in de <a href=\"https://goatcounter.com/help/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">privacy-informatie van GoatCounter</a> (in het Engels).",
+            "optout.button": "Statistieken uitschakelen",
+            "optin.button": "Statistieken staan uit — klik om weer in te schakelen",
+            "optout.status": "Statistieken zijn uitgeschakeld in deze browser.",
+            "contact.title": "Contact",
+            "contact.text": "Heeft u vragen? Mail ons via <a href=\"mailto:KroxenStudios@proton.me\">KroxenStudios@proton.me</a>."
+        },
+        pl: {
+            "intro": "Eksperymentalny silnik gier skupiony na rozległych krajobrazach, klimatycznej atmosferze i eksploracji na długich dystansach.",
+            "github": "Repozytorium GitHub",
+            "img1": "Złota godzina",
+            "img2": "Niebieska godzina",
+            "img4": "Woda",
+            "img5": "Dolina rzeki w dzień i o zmierzchu",
+            "notice.text": "Ta strona korzysta z GoatCounter do statystyk odwiedzin.",
+            "notice.ok": "Rozumiem",
+            "privacy.link": "Ustawienia prywatności",
+            "contact.link": "Kontakt",
+            "footer.pictures": "Obrazy: 25.10–28.10.2026",
+            "footer.copyright": "© 2026 KroxenStudios, gałąź rozwojowa KROX.",
+            "back": "← Wróć na stronę główną",
+            "privacy.title": "Ustawienia prywatności",
+            "privacy.intro": "Ta strona korzysta z GoatCounter do statystyk odwiedzin. Zbierane są następujące dane:",
+            "privacy.sessions": "<strong>Sesje:</strong> odsłony tego samego odwiedzającego są łączone w sesję trwającą do 8 godzin.",
+            "privacy.country": "<strong>Kraj:</strong> kraj odwiedzającego.",
+            "privacy.region": "<strong>Region:</strong> region odwiedzającego, jeśli jest dostępny. Poziom szczegółowości zależy od kraju.",
+            "privacy.ua": "<strong>User-Agent:</strong> przeglądarka i system operacyjny są określane na podstawie nagłówka User-Agent. Sam nagłówek nie jest zapisywany.",
+            "privacy.lang": "<strong>Język:</strong> preferowany język jest określany na podstawie informacji wysyłanych przez przeglądarkę. Zapisywany jest tylko język, a nie oryginalny nagłówek.",
+            "privacy.optout.text": "GoatCounter oferuje statystyki przyjazne prywatności, bez plików cookie. Poniżej można je wyłączyć dla tej przeglądarki. Wybór jest zapisywany w tej przeglądarce.",
+            "privacy.more": "Więcej informacji znajdzie się w <a href=\"https://goatcounter.com/help/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">informacjach o prywatności GoatCounter</a> (po angielsku).",
+            "optout.button": "Wyłącz statystyki",
+            "optin.button": "Statystyki wyłączone — kliknij, aby włączyć ponownie",
+            "optout.status": "Statystyki są wyłączone w tej przeglądarce.",
+            "contact.title": "Kontakt",
+            "contact.text": "W razie pytań prosimy o kontakt: <a href=\"mailto:KroxenStudios@proton.me\">KroxenStudios@proton.me</a>."
+        }
+    };
+
+    let currentLang = "en";
+
+    function t(key) {
+        return (translations[currentLang] && translations[currentLang][key]) ||
+            translations.en[key] || key;
+    }
+
+    function detectLanguage() {
+        try {
+            const saved = localStorage.getItem(langKey);
+            if (saved && translations[saved]) {
+                return saved;
+            }
+        } catch {
+            // Ohne Storage wird nur die Browsersprache verwendet.
+        }
+
+        const preferred = (navigator.languages && navigator.languages[0]) ||
+            navigator.language || "en";
+        const short = preferred.toLowerCase().slice(0, 2);
+        return translations[short] ? short : "en";
+    }
+
+    function applyLanguage(lang, remember) {
+        currentLang = translations[lang] ? lang : "en";
+        document.documentElement.lang = currentLang;
+        document.title = t("title");
+
+        document.querySelectorAll("[data-i18n]").forEach(el => {
+            el.textContent = t(el.dataset.i18n);
+        });
+        document.querySelectorAll("[data-i18n-html]").forEach(el => {
+            el.innerHTML = t(el.dataset.i18nHtml);
+        });
+        document.querySelectorAll("[data-i18n-alt]").forEach(el => {
+            el.alt = t(el.dataset.i18nAlt);
+        });
+        langSelect.value = currentLang;
+
+        updateOptOutStatus();
+
+        if (remember) {
+            try {
+                localStorage.setItem(langKey, currentLang);
+            } catch {
+                // Die Sprachwahl gilt dann nur für diesen Besuch.
+            }
+        }
+    }
+
+    langSelect.addEventListener("change", () => {
+        applyLanguage(langSelect.value, true);
+    });
 
     function hasOptedOut() {
         try {
@@ -501,11 +1028,10 @@
         }
 
         if (hasOptedOut()) {
-            optOutButton.textContent = "Opt out is enabled — click to opt in";
-            optOutStatus.textContent =
-                "Analytics is disabled in this browser.";
+            optOutButton.textContent = t("optin.button");
+            optOutStatus.textContent = t("optout.status");
         } else {
-            optOutButton.textContent = "Opt out of analytics";
+            optOutButton.textContent = t("optout.button");
             optOutStatus.textContent = "";
         }
     }
@@ -570,11 +1096,159 @@
         });
     }
 
-    updateOptOutStatus();
+    // Scroll-Fortschritt, höchstens einmal pro Frame aktualisiert.
+    const progressBar = document.querySelector("#progress");
+    let progressQueued = false;
+
+    function updateProgress() {
+        progressQueued = false;
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const ratio = max > 0 ? Math.min(window.scrollY / max, 1) : 0;
+        progressBar.style.transform = `scaleX(${ratio})`;
+    }
+
+    window.addEventListener("scroll", () => {
+        if (!progressQueued) {
+            progressQueued = true;
+            requestAnimationFrame(updateProgress);
+        }
+    }, { passive: true });
+
+    /*
+     * Designwechsel: Seite und Bilder wechseln im selben Zug und mit
+     * derselben Dauer (--theme-fade). Dafür werden zuerst die passenden
+     * Bildvarianten vorgeladen; erst dann wird per View Transition die
+     * ganze Seite weich überblendet. Ohne View-Transition-Unterstützung
+     * oder bei reduzierter Bewegung wechselt alles sofort.
+     *
+     * Eigene Bilder je Design: Liegen images/01-light.png bzw. 01-dark.png
+     * vor, werden sie verwendet. Fehlt die Datei, bleibt das Standardbild
+     * samt Farbfilter stehen.
+     */
+    const variantImages = document.querySelectorAll("img[data-variant]");
+
+    function resolveVariants(theme) {
+        const mode = theme === "canvas" ? "light" : "dark";
+
+        return Promise.all(Array.from(variantImages).map(img => {
+            const fallback = img.dataset.defaultSrc ||
+                (img.dataset.defaultSrc = img.getAttribute("src"));
+            const wanted = `images/${img.dataset.variant}-${mode}.png`;
+
+            return new Promise(resolve => {
+                const probe = new Image();
+                probe.onload = () => resolve({ img, src: wanted, variant: true });
+                probe.onerror = () => resolve({ img, src: fallback, variant: false });
+                probe.src = wanted;
+            });
+        }));
+    }
+
+    function commitTheme(theme, resolved) {
+        document.documentElement.dataset.theme = theme;
+
+        resolved.forEach(({ img, src, variant }) => {
+            if (img.getAttribute("src") !== src) {
+                img.src = src;
+            }
+            img.classList.toggle("has-variant", variant);
+        });
+    }
+
+    async function setTheme(theme, animate) {
+        const resolved = await resolveVariants(theme);
+        const reduced = window.matchMedia &&
+            matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        if (animate && !reduced && document.startViewTransition) {
+            document.startViewTransition(() => commitTheme(theme, resolved));
+        } else {
+            commitTheme(theme, resolved);
+        }
+    }
+
+    document.querySelector("#theme-toggle").addEventListener("click", () => {
+        const next = document.documentElement.dataset.theme === "canvas"
+            ? "dark" : "canvas";
+
+        setTheme(next, true);
+
+        try {
+            localStorage.setItem("kroxenstudios-theme", next);
+        } catch {
+            // Das Design gilt dann nur für diesen Besuch.
+        }
+    });
+
+    // Wechselt das System das Design, folgt die Seite – solange keine
+    // eigene Wahl gespeichert ist.
+    if (window.matchMedia) {
+        matchMedia("(prefers-color-scheme: light)").addEventListener("change", e => {
+            try {
+                if (localStorage.getItem("kroxenstudios-theme")) {
+                    return;
+                }
+            } catch {}
+
+            setTheme(e.matches ? "canvas" : "dark", true);
+        });
+    }
+
+    /*
+     * Hover: Nach 1,5 s wird auf dem Bild die Variante des jeweils anderen
+     * Designs eingeblendet; beim Verlassen blendet sie wieder aus. Nur für
+     * Bilder, die eigene -light/-dark-Dateien haben.
+     */
+    const ALT_DELAY_MS = 1500;
+
+    variantImages.forEach(img => {
+        const frame = img.closest(".frame");
+        if (!frame) return;
+
+        const overlay = document.createElement("img");
+        overlay.className = "alt-overlay";
+        overlay.alt = "";
+        overlay.setAttribute("aria-hidden", "true");
+        frame.appendChild(overlay);
+
+        let timer = 0;
+
+        const hide = () => {
+            clearTimeout(timer);
+            overlay.classList.remove("show");
+        };
+
+        frame.addEventListener("mouseenter", () => {
+            if (!img.classList.contains("has-variant")) return;
+
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                const other = document.documentElement.dataset.theme === "canvas" ? "dark" : "light";
+                const src = `images/${img.dataset.variant}-${other}.png`;
+                const show = () => overlay.classList.add("show");
+
+                overlay.onload = show;
+                overlay.onerror = hide;
+                if (overlay.getAttribute("src") === src && overlay.complete) {
+                    show();
+                } else {
+                    overlay.src = src;
+                }
+            }, ALT_DELAY_MS);
+        });
+
+        frame.addEventListener("mouseleave", hide);
+    });
+
+    setTheme(document.documentElement.dataset.theme, false);
+
+    applyLanguage(detectLanguage(), false);
     loadGoatCounter();
 
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
+            document.body.classList.add("intro-start");
+
             setTimeout(() => {
                 document.body.classList.add("intro-complete");
                 startImageAnimations();
