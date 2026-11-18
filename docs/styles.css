@@ -1,12 +1,3 @@
-/*
- * Alternatives Design "Leinwand": heller, leicht gebrochener Hintergrund
- * mit Gewebestruktur, Vignette und Tiefe durch geschichtete Schatten.
- *
- * Die Datei ergänzt die Inline-Styles in index.html und wirkt nur,
- * wenn <html data-theme="canvas"> gesetzt ist. Ohne das Attribut bleibt
- * das dunkle Standarddesign unverändert.
- */
-
 html[data-theme="canvas"] {
     color-scheme: light;
 
