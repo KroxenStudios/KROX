@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark">
 
-    <title>KROX - Game Engine</title>
+    <title>KROX Game Engine</title>
     <link rel="icon" href="images/KROX-black.ico" type="image/x-icon">
     <link rel="icon" href="images/KROX-white.ico" type="image/x-icon" media="(prefers-color-scheme: dark)">
 
@@ -22,7 +22,6 @@
             --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        /* Dauer des Designwechsels, gilt für Seite und Bilder gleichermaßen */
         :root {
             --theme-fade: 700ms;
         }
@@ -126,11 +125,6 @@
             transition: transform 1200ms var(--ease-out), filter 600ms ease;
         }
 
-        /*
-         * Bildton passend zum Design: im dunklen Design etwas abgedunkelt
-         * und kontrastreicher, im hellen (styles.css) aufgehellt. Beim
-         * Darüberfahren erscheint das Bild im Originalton.
-         */
         .frame img:not(.has-variant) {
             filter: brightness(0.82) contrast(1.08) saturate(1.05);
         }
@@ -145,7 +139,7 @@
             }
         }
 
-        /* Nach 1,5 s Hover blendet das Overlay die Variante des anderen Designs ein. */
+
         .frame {
             position: relative;
         }
@@ -185,10 +179,6 @@
             border-radius: 4px;
         }
 
-        /*
-         * Ohne JavaScript sind alle Inhalte sofort sichtbar.
-         * Animationen werden nur mit der Klasse .js-enabled eingeschaltet.
-         */
         figure.slide-in {
             opacity: 1;
             transform: none;
@@ -214,7 +204,6 @@
             transform: translateX(0);
         }
 
-        /* Einblenden des Seitenkopfs, gestaffelt */
         body.js-enabled header > * {
             opacity: 0;
             transform: translateY(14px);
@@ -285,10 +274,6 @@
             text-decoration: underline;
         }
 
-        /*
-         * Die Unterseiten funktionieren über CSS :target,
-         * also auch ohne JavaScript.
-         */
         .content-page {
             display: none;
             padding-top: 60px;
@@ -349,7 +334,7 @@
             transform: scale(0.97);
         }
 
-        /* Fortschrittsanzeige beim Scrollen (nur mit JavaScript) */
+
         .progress {
             position: fixed;
             top: 0;
@@ -364,7 +349,7 @@
             pointer-events: none;
         }
 
-        /* Sprachumschalter */
+
         .lang-switch {
             position: fixed;
             top: 16px;
@@ -404,10 +389,6 @@
             color: #fff;
         }
 
-        /*
-         * Der Hinweis wird nur angezeigt, wenn JavaScript läuft
-         * und Analytics gegebenenfalls geladen werden kann.
-         */
         .notice {
             display: none;
             position: fixed;
@@ -525,11 +506,8 @@
         }
     </style>
 
-    <!-- Alternatives Design "Leinwand"; wirkt nur bei data-theme="canvas" -->
     <link rel="stylesheet" href="styles.css">
     <script>
-        /* Früh gesetzt, damit beim Laden nichts aufblitzt. */
-        /* Ohne gespeicherte Wahl folgt das Design dem System. */
         (function () {
             let theme = null;
             try {
@@ -556,10 +534,6 @@
         <option value="en">English</option>
         <option value="de">Deutsch</option>
         <option value="fr">Français</option>
-        <option value="es">Español</option>
-        <option value="it">Italiano</option>
-        <option value="pt">Português</option>
-        <option value="nl">Nederlands</option>
         <option value="pl">Polski</option>
     </select>
     <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Theme" title="Dark / Canvas">◐</button>
@@ -575,17 +549,16 @@
 
 <header>
     <img class="logo" src="images/KROX-white.ico" alt="KROX">
-    <p class="subtitle">Game Engine</p>
+    <p class="subtitle">KROX Game Engine</p>
 
     <p data-i18n="intro">
-        An experimental game engine focused on large-scale landscapes,
-        atmosphere and long-distance exploration.
+        KROX is focused on keeping large environments running smoothly, while providing a good workflow for developers.
     </p>
 
     <a class="github-link"
        href="https://github.com/KroxenStudios/KROX"
        target="_blank"
-       rel="noopener noreferrer"><span data-i18n="github">GitHub Repository</span> <span aria-hidden="true">→</span></a>
+       rel="noopener noreferrer"><span data-i18n="github">GitHub Repository (only web-page)</span> <span aria-hidden="true">→</span></a>
 </header>
 
 <main>
@@ -606,7 +579,7 @@
 
     <footer>
         <p data-i18n="footer.pictures">Pictures: 25.10–18.11.2026</p>
-        <p data-i18n="footer.copyright">Copyright © 2026 KroxenStudios, a development branch of KROX.</p>
+        <p data-i18n="footer.copyright">Copyright © 2026 KroxenStudios</p>
         <p>
             <a href="#privacy" data-i18n="privacy.link">Privacy settings</a>
             &nbsp;·&nbsp;
@@ -642,7 +615,7 @@
             derived from the User-Agent header. The header itself is not stored.
         </li>
         <li data-i18n-html="privacy.lang">
-            <strong>Language:</strong> the visitor’s preferred language is derived from the language information sent by the browser.
+            <strong>Language:</strong> the visitor’s preferred language from the language information sent by the browser.
             Only the language is stored, not the original header.
         </li>
     </ul>
@@ -664,7 +637,7 @@
         <a href="https://goatcounter.com/help/privacy"
            target="_blank"
            rel="noopener noreferrer">
-            GoatCounter’s privacy information
+            GoatCounter privacy information
         </a>.
     </p>
 </section>
@@ -681,10 +654,7 @@
 </section>
 
 <script>
-    /*
-     * Die Seite funktioniert auch ohne dieses Script (Englisch).
-     * Diese Klasse aktiviert lediglich die optionalen Effekte.
-     */
+
     document.body.classList.add("js-enabled");
 
     const goatCounterCode = "kroxenstudios";
@@ -698,11 +668,6 @@
     const optOutButton = document.querySelector("#analytics-opt-out");
     const optOutStatus = document.querySelector("#opt-out-status");
 
-    /*
-     * Übersetzungen. Englisch steht zusätzlich im HTML, damit die Seite
-     * ohne JavaScript vollständig bleibt. Die deutschen Texte sind frei
-     * formuliert und keine Wort-für-Wort-Übersetzung.
-     */
     const translations = {
         en: {
             "title": "KROX - Game Engine",
@@ -954,7 +919,7 @@
                 return saved;
             }
         } catch {
-            // Ohne Storage wird nur die Browsersprache verwendet.
+            // nur browsersprache verwenden
         }
 
         const preferred = (navigator.languages && navigator.languages[0]) ||
@@ -985,7 +950,7 @@
             try {
                 localStorage.setItem(langKey, currentLang);
             } catch {
-                // Die Sprachwahl gilt dann nur für diesen Besuch.
+                // sprachwahl nur für diesen besuch
             }
         }
     }
@@ -1041,7 +1006,7 @@
             try {
                 localStorage.setItem(noticeKey, "yes");
             } catch {
-                // Die Schaltfläche blendet den Hinweis auch ohne Storage aus.
+                
             }
 
             notice.hidden = true;
@@ -1053,7 +1018,7 @@
             notice.hidden = true;
         }
     } catch {
-        // Bei nicht verfügbarem Storage bleibt der Hinweis sichtbar.
+        // ohne storage bleibt der hinweis sichtbar
     }
 
     if (optOutButton) {
@@ -1065,7 +1030,7 @@
                     localStorage.setItem(optOutKey, "yes");
                 }
             } catch {
-                // Die Opt-out-Einstellung kann ohne Storage nicht gespeichert werden.
+                // opt-out einstellung kann ohne storage nicht gespeichert werden
             }
 
             updateOptOutStatus();
@@ -1096,7 +1061,7 @@
         });
     }
 
-    // Scroll-Fortschritt, höchstens einmal pro Frame aktualisiert.
+    // höchstens 1x pro frame aktualisiert
     const progressBar = document.querySelector("#progress");
     let progressQueued = false;
 
@@ -1114,17 +1079,6 @@
         }
     }, { passive: true });
 
-    /*
-     * Designwechsel: Seite und Bilder wechseln im selben Zug und mit
-     * derselben Dauer (--theme-fade). Dafür werden zuerst die passenden
-     * Bildvarianten vorgeladen; erst dann wird per View Transition die
-     * ganze Seite weich überblendet. Ohne View-Transition-Unterstützung
-     * oder bei reduzierter Bewegung wechselt alles sofort.
-     *
-     * Eigene Bilder je Design: Liegen images/01-light.png bzw. 01-dark.png
-     * vor, werden sie verwendet. Fehlt die Datei, bleibt das Standardbild
-     * samt Farbfilter stehen.
-     */
     const variantImages = document.querySelectorAll("img[data-variant]");
 
     function resolveVariants(theme) {
@@ -1176,12 +1130,11 @@
         try {
             localStorage.setItem("kroxenstudios-theme", next);
         } catch {
-            // Das Design gilt dann nur für diesen Besuch.
+            // design gilt nur für diesen besuch
         }
     });
 
-    // Wechselt das System das Design, folgt die Seite – solange keine
-    // eigene Wahl gespeichert ist.
+
     if (window.matchMedia) {
         matchMedia("(prefers-color-scheme: light)").addEventListener("change", e => {
             try {
@@ -1194,11 +1147,7 @@
         });
     }
 
-    /*
-     * Hover: Nach 1,5 s wird auf dem Bild die Variante des jeweils anderen
-     * Designs eingeblendet; beim Verlassen blendet sie wieder aus. Nur für
-     * Bilder, die eigene -light/-dark-Dateien haben.
-     */
+
     const ALT_DELAY_MS = 1500;
 
     variantImages.forEach(img => {
